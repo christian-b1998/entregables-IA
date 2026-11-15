@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Riwi Task Manager</title>
+    <style>
+        :root {
+            --bg: #F4F5FA;
+            --card: #fff;
+            --tx: #171B49;
+            --mut: #5b6080;
+            --bd: #e3e5f0;
+            --pr: #6857E8;
+            --navy: #171B49;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media(prefers-color-scheme:dark) {
+            :root:not([data-theme=light]) {
+                --bg: #0f1230;
+                --card: #1a1e4a;
+                --tx: #eef0ff;
+                --mut: #a9aed6;
+                --bd: #2d3272;
+                color-scheme: dark
+            }
+        }
+
+        :root[data-theme=dark] {
+            --bg: #0f1230;
+            --card: #1a1e4a;
+            --tx: #eef0ff;
+            --mut: #a9aed6;
+            --bd: #2d3272;
+            color-scheme: dark
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--tx);
+            font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+            color: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+            margin: 0
+        }
+
+        .btn {
+            border: 1px solid var(--bd);
+            background: var(--card);
+            border-radius: 10px;
+            padding: 8px 14px;
+            min-height: 40px;
+            font-weight: 600
+        }
+
+        .btn.p {
+            background: var(--pr);
+            border-color: var(--pr);
+            color: #fff
+        }
+
+        .btn.d {
+            color: #B91C1C;
+            border-color: #B91C1C
+        }
+
+        .btn.s {
+            min-height: 32px;
+            padding: 3px 10px;
+            font-size: 13px
+        }
+
+        .btn:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        .tt:focus-visible,
+        .ck:focus-visible {
+            outline: 3px solid #a89cf5;
+            outline-offset: 1px
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 1px 3px rgba(23, 27, 73, .06)
+        }
+
+        .g {
+            display: grid;
+            gap: 14px
+        }
+
+        .g5 {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))
+        }
+
+        .g4 {
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr))
+        }
+
+        .g2 {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr))
+        }
+
+        .mut {
+            color: var(--mut);
+            font-size: 13px
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .sp {
+            flex: 1
+        }
+
+        .ls {
+            display: inline-flex;
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--card)
+        }
+
+        .ls button {
+            border: 0;
+            background: none;
+            padding: 6px 10px;
+            min-height: 38px;
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .ls button[aria-pressed=true] {
+            background: var(--pr);
+            color: #fff
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -.5px
+        }
+
+        .logo b {
+            color: var(--pr)
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh
+        }
+
+        .side {
+            width: 244px;
+            background: var(--navy);
+            color: #fff;
+            padding: 18px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            flex: none
+        }
+
+        .side .logo {
+            padding: 6px 10px 16px
+        }
+
+        .side .logo b {
+            color: #a89cf5
+        }
+
+        .nv {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            border: 0;
+            background: none;
+            color: #cfd2f5;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-align: left;
+            font-weight: 600;
+            min-height: 44px
+        }
+
+        .nv:hover {
+            background: rgba(255, 255, 255, .08)
+        }
+
+        .nv[aria-current=page] {
+            background: var(--pr);
+            color: #fff
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 20px 24px 80px
+        }
+
+        .hd {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px
+        }
+
+        .hd input {
+            flex: 1;
+            min-width: 140px;
+            max-width: 320px
+        }
+
+        .mb {
+            display: none
+        }
+
+        input,
+        select,
+        textarea {
+            border: 1px solid var(--bd);
+            background: var(--card);
+            border-radius: 10px;
+            padding: 8px 12px;
+            min-height: 40px;
+            width: 100%
+        }
+
+        .hd input {
+            width: auto
+        }
+
+        .av {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            flex: none
+        }
+
+        .nb {
+            background: #EF4444;
+            color: #fff;
+            border-radius: 99px;
+            font-size: 11px;
+            padding: 0 6px;
+            margin-left: 4px
+        }
+
+        .sc {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .ic {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            background: color-mix(in srgb, var(--c) 15%, transparent);
+            color: var(--tx);
+            border: 1px solid var(--c);
+            flex: none
+        }
+
+        .sc b {
+            font-size: 26px;
+            line-height: 1
+        }
+
+        .pb {
+            height: 8px;
+            border-radius: 9px;
+            background: var(--bd);
+            overflow: hidden;
+            margin-top: 8px
+        }
+
+        .pb i {
+            display: block;
+            height: 100%;
+            background: var(--c);
+            transition: width .4s
+        }
+
+        button.card {
+            text-align: left;
+            width: 100%
+        }
+
+        button.card:hover {
+            border-color: var(--pr)
+        }
+
+        button.card[aria-pressed=true] {
+            outline: 2px solid var(--pr)
+        }
+
+        .sec h2 {
+            font-size: 17px;
+            margin-bottom: 12px
+        }
+
+        .tk {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--bd);
+            border-radius: 12px;
+            background: var(--card);
+            margin-bottom: 8px;
+            flex-wrap: wrap
+        }
+
+        .tk.dn .tt {
+            text-decoration: line-through;
+            color: var(--mut)
+        }
+
+        .tm {
+            flex: 1;
+            min-width: 200px
+        }
+
+        .ck {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 2px solid var(--mut);
+            background: none;
+            font-weight: 800;
+            color: #fff;
+            flex: none
+        }
+
+        .dn .ck {
+            background: #22C55E;
+            border-color: #22C55E
+        }
+
+        .tt {
+            border: 0;
+            background: none;
+            padding: 0;
+            font-weight: 700;
+            text-align: left;
+            font-size: 15px
+        }
+
+        .ch {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px
+        }
+
+        .ch span {
+            font-size: 12px;
+            border: 1px solid var(--bd);
+            border-radius: 99px;
+            padding: 1px 9px;
+            color: var(--mut)
+        }
+
+        .ch .cc {
+            color: var(--tx);
+            border-color: var(--c);
+            background: color-mix(in srgb, var(--c) 12%, transparent)
+        }
+
+        .bdg {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1.5px solid var(--c);
+            background: color-mix(in srgb, var(--c) 13%, transparent);
+            border-radius: 99px;
+            padding: 2px 10px;
+            white-space: nowrap
+        }
+
+        .bdg b {
+            color: var(--c);
+            filter: brightness(.9)
+        }
+
+        .cards .tk {
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 0
+        }
+
+        .cards {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))
+        }
+
+        .tb {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            margin-bottom: 14px
+        }
+
+        .emp {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--mut)
+        }
+
+        .emp b {
+            display: block;
+            color: var(--tx);
+            font-size: 17px;
+            margin-bottom: 4px
+        }
+
+        .cal {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px
+        }
+
+        .cal .w {
+            text-align: center;
+            font-size: 12px;
+            color: var(--mut);
+            font-weight: 700;
+            padding: 4px 0
+        }
+
+        .cd {
+            min-height: 68px;
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            background: var(--card);
+            padding: 4px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 13px
+        }
+
+        .cd.o {
+            opacity: .45
+        }
+
+        .cd.t {
+            border: 2px solid var(--pr)
+        }
+
+        .cd[aria-pressed=true] {
+            background: color-mix(in srgb, var(--pr) 14%, var(--card))
+        }
+
+        .dots {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .dots i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--c)
+        }
+
+        .dots em {
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 800
+        }
+
+        .cd.hv {
+            box-shadow: inset 0 0 0 2px #F97316
+        }
+
+        .ov {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 12, 40, .55);
+            display: grid;
+            place-items: center;
+            padding: 12px;
+            z-index: 50;
+            overflow: auto
+        }
+
+        .md {
+            width: 100%;
+            max-width: 560px;
+            max-height: 92vh;
+            overflow: auto
+        }
+
+        .md label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin: 10px 0 3px
+        }
+
+        .er {
+            color: #B91C1C;
+            font-size: 12.5px;
+            display: block
+        }
+
+        .fm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 12px
+        }
+
+        .fm .f {
+            grid-column: 1/-1
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 12px;
+            z-index: 80;
+            font-weight: 600;
+            max-width: 90vw
+        }
+
+        .don {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            flex: none
+        }
+
+        .don div {
+            width: 104px;
+            height: 104px;
+            border-radius: 50%;
+            background: var(--card);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 26px
+        }
+
+        .bars {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            height: 140px
+        }
+
+        .bars div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            font-size: 12px
+        }
+
+        .bars i {
+            width: 100%;
+            background: var(--pr);
+            border-radius: 6px 6px 0 0;
+            min-height: 3px
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: center;
+            padding: 40px 0
+        }
+
+        .hero h1 {
+            font-size: clamp(30px, 5vw, 50px);
+            line-height: 1.1;
+            letter-spacing: -1px
+        }
+
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 16px 20px
+        }
+
+        .stu {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid var(--bd);
+            border-radius: 14px;
+            background: var(--card);
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left
+        }
+
+        .stu[aria-pressed=true] {
+            border-color: var(--pr)
+        }
+
+        @media(max-width:860px) {
+            .side {
+                position: fixed;
+                left: 0;
+                top: 0;
+                z-index: 40;
+                transform: translateX(-100%);
+                transition: transform .25s
+            }
+
+            .side.open {
+                transform: none
+            }
+
+            .mb {
+                display: inline-flex
+            }
+
+            .main {
+                padding: 14px 12px 80px
+            }
+
+            .hero {
+                grid-template-columns: 1fr
+            }
+
+            .qa {
+                display: none
+            }
+
+            .fm {
+                grid-template-columns: 1fr
+            }
+
+            .cd {
+                min-height: 52px
+            }
+
+            .btn {
+                min-height: 44px
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            * {
+                transition: none !important
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+    <div id="m"></div>
+    <script>
+        const D = {
+            'nav.dash': ['Dashboard', 'Panel principal'], 'nav.tasks': ['My Tasks', 'Mis tareas'], 'nav.cal': ['Calendar', 'Calendario'], 'nav.cats': ['Categories', 'Categorías'], 'nav.jour': ['My Learning Journey', 'Mi progreso de aprendizaje'], 'nav.sett': ['Settings', 'Configuración'],
+            'c.dev': ['Development', 'Desarrollo'], 'c.eng': ['English', 'Inglés'], 'c.soc': ['Socio-emotional Skills', 'Habilidades socioemocionales'], 'c.oth': ['Other', 'Otro'],
+            'ty.main': ['Main Challenge', 'Reto principal'], 'ty.practice': ['Practice', 'Práctica'], 'ty.comp': ['Complementary Activity', 'Actividad complementaria'], 'ty.project': ['Project', 'Proyecto'], 'ty.assess': ['Assessment', 'Evaluación'], 'ty.personal': ['Personal Reminder', 'Recordatorio personal'], 'ty.admin': ['Administrative Task', 'Tarea administrativa'], 'ty.other': ['Other', 'Otro'],
+            'st.pending': ['Pending', 'Pendiente'], 'st.progress': ['In Progress', 'En progreso'], 'st.done': ['Completed', 'Completada'], 'st.overdue': ['Overdue', 'Vencida'],
+            'pr.low': ['Low', 'Baja'], 'pr.med': ['Medium', 'Media'], 'pr.high': ['High', 'Alta'],
+            'src.riwi': ['Riwi platform (simulated)', 'Plataforma Riwi (simulada)'], 'src.challenges': ['Development challenges', 'Retos de desarrollo'], 'src.english': ['English activities', 'Actividades de inglés'], 'src.instructor': ['Instructor assignment', 'Tarea del instructor'], 'src.personal': ['Personal reminder', 'Recordatorio personal'],
+            'tag': ['One platform. All your tasks. No missed deadlines.', 'Una plataforma. Todas tus tareas. Cero entregas olvidadas.'],
+            'h1': ['Your entire learning journey, organized in one place.', 'Tu proceso de aprendizaje, organizado en un solo lugar.'],
+            'h2': ['Keep track of every assignment, challenge, and deadline. Stay organized, monitor your progress, and never miss an important task again.', 'Organiza tus actividades, controla tus entregas y mantén el seguimiento de tu progreso. Nunca vuelvas a olvidar una tarea importante.'],
+            'start': ['Get Started', 'Comenzar'], 'feat': ['Features', 'Funciones'], 'ftit': ['Everything in one dashboard', 'Todo en un solo panel'],
+            'f1': ['Centralized tasks', 'Tareas centralizadas'], 'f1d': ['Challenges, English and soft skills side by side.', 'Retos, inglés y habilidades blandas en un solo lugar.'],
+            'f2': ['Smart deadlines', 'Entregas inteligentes'], 'f2d': ['Colors, icons and labels show what is urgent.', 'Colores, íconos y etiquetas muestran lo urgente.'],
+            'f3': ['Progress monitoring', 'Seguimiento del progreso'], 'f3d': ['See your completion by category and week.', 'Mira tu avance por categoría y semana.'],
+            'f4': ['Personal dashboard', 'Panel personalizado'], 'f4d': ['Today’s focus and upcoming work at a glance.', 'Tu foco de hoy y lo próximo de un vistazo.'],
+            'f5': ['Quick task creation', 'Creación rápida de tareas'], 'f5d': ['Save a verbal assignment in seconds.', 'Guarda una tarea verbal en segundos.'],
+            'cta': ['Ready to take control?', '¿Listo para tomar el control?'], 'proto': ['Prototype with sample data. Not connected to Riwi systems.', 'Prototipo con datos de ejemplo. No está conectado a los sistemas de Riwi.'],
+            'wel': ['Welcome back', 'Bienvenido de nuevo'], 'pick': ['Choose a simulated student profile', 'Elige un perfil de estudiante simulado'], 'enter': ['Sign in (simulated)', 'Ingresar (simulado)'], 'back': ['Back to home', 'Volver al inicio'],
+            'hi': ['Hello, {n}', 'Hola, {n}'], 'search': ['Search tasks…', 'Buscar tareas…'], 'quick': ['Quick Add Task', 'Agregar tarea'],
+            'total': ['Total Tasks', 'Total de tareas'], 'soon': ['Due Soon', 'Por vencer'], 'dueToday': ['Due Today', 'Vence hoy'],
+            'tasksN': ['{n} tasks', '{n} tareas'], 'doneN': ['{n} completed', '{n} completadas'], 'pendN': ['{n} pending', '{n} pendientes'],
+            'focus': ["Today's Focus", 'Foco de hoy'], 'upc': ['Upcoming Deadlines', 'Próximas entregas'], 'rec': ['Recent Activity', 'Actividad reciente'],
+            'a.completed': ['Task completed', 'Tarea completada'], 'a.created': ['New task created', 'Nueva tarea creada'], 'a.reopened': ['Task reopened', 'Tarea reabierta'], 'a.updated': ['Task updated', 'Tarea actualizada'], 'a.deleted': ['Task deleted', 'Tarea eliminada'], 'a.deadline': ['Deadline updated', 'Fecha límite actualizada'],
+            'in': ['Due in {n} days', 'Vence en {n} días'], 'tmr': ['Due tomorrow', 'Vence mañana'], 'tod': ['Due today', 'Vence hoy'], 'ov1': ['Overdue by 1 day', 'Vencida hace 1 día'], 'ov': ['Overdue by {n} days', 'Vencida hace {n} días'],
+            'all': ['All', 'Todos'], 'fcat': ['Category', 'Categoría'], 'fst': ['Status', 'Estado'], 'fpr': ['Priority', 'Prioridad'], 'fty': ['Task type', 'Tipo de tarea'], 'fdl': ['Deadline', 'Fecha límite'], 'fsrc': ['Source', 'Origen'],
+            'any': ['Any', 'Cualquiera'], 'dl.over': ['Overdue', 'Vencidas'], 'dl.today': ['Due today', 'Vencen hoy'], 'dl.week': ['Next 7 days', 'Próximos 7 días'], 'dl.later': ['Later', 'Más adelante'],
+            'sort': ['Sort', 'Ordenar'], 's.asc': ['Closest deadline', 'Fecha más cercana'], 's.desc': ['Furthest deadline', 'Fecha más lejana'], 's.pr': ['Priority', 'Prioridad'], 's.new': ['Recently created', 'Creadas recientemente'], 's.az': ['Alphabetical', 'Alfabético'],
+            'v.list': ['List', 'Lista'], 'v.card': ['Cards', 'Tarjetas'], 'noRes': ['No tasks found', 'No se encontraron tareas'], 'noResD': ['Try changing filters or add a new task.', 'Prueba cambiar los filtros o agrega una nueva tarea.'], 'clr': ['Clear filters', 'Limpiar filtros'],
+            'ttl': ['Title', 'Título'], 'desc': ['Description', 'Descripción'], 'fnotes': ['Notes (optional)', 'Notas (opcional)'], 'url': ['External link (optional)', 'Enlace externo (opcional)'], 'none': ['None', 'Ninguno'],
+            'addT': ['Quick Add Task', 'Agregar tarea'], 'editT': ['Edit Task', 'Editar tarea'], 'save': ['Save Changes', 'Guardar cambios'], 'cancel': ['Cancel', 'Cancelar'], 'del': ['Delete Task', 'Eliminar tarea'], 'edit': ['Edit', 'Editar'], 'close': ['Close', 'Cerrar'],
+            'delQ': ['Delete this task? This cannot be undone.', '¿Eliminar esta tarea? Esta acción no se puede deshacer.'],
+            'eT': ['Enter a title (at least 3 characters).', 'Escribe un título (mínimo 3 caracteres).'], 'eD': ['Choose a deadline.', 'Elige una fecha límite.'],
+            'ok.c': ['Task created', 'Tarea creada'], 'ok.s': ['Changes saved', 'Cambios guardados'], 'ok.d': ['Task deleted', 'Tarea eliminada'], 'ok.done': ['Task completed. Nice work!', 'Tarea completada. ¡Buen trabajo!'], 'ok.re': ['Task reopened', 'Tarea reabierta'],
+            'complete': ['Mark as completed', 'Marcar como completada'], 'reopen': ['Reopen task', 'Reabrir tarea'], 'created': ['Created', 'Creada'], 'open': ['Open link', 'Abrir enlace'],
+            'cal.today': ['Today', 'Hoy'], 'cal.no': ['No deadlines on this day.', 'No hay entregas este día.'],
+            'ov.pct': ['Overall completion', 'Avance general'], 'dvp': ['Completed vs pending', 'Completadas vs pendientes'], 'bycat': ['Progress by category', 'Progreso por categoría'], 'l7': ['Completed in the last 7 days', 'Completadas en los últimos 7 días'], 'stats': ['Activity statistics', 'Estadísticas de actividad'],
+            'sHigh': ['High priority pending', 'Prioridad alta pendientes'], 'sProg': ['In progress', 'En progreso'], 's7': ['Completed this week', 'Completadas esta semana'], 'sSrc': ['Active sources', 'Orígenes activos'],
+            'prof': ['Student profile', 'Perfil del estudiante'], 'acct': ['Switch account (simulated)', 'Cambiar de cuenta (simulado)'], 'lang': ['Language', 'Idioma'], 'theme': ['Theme', 'Tema'], 'auto': ['Automatic', 'Automático'], 'light': ['Light', 'Claro'], 'dark': ['Dark', 'Oscuro'],
+            'notif': ['Notifications', 'Notificaciones'], 'nOn': ['Show reminders for urgent tasks', 'Mostrar recordatorios de tareas urgentes'], 'disp': ['Task display', 'Visualización de tareas'], 'hide': ['Hide completed tasks in lists', 'Ocultar tareas completadas en las listas'],
+            'logout': ['Switch account', 'Cambiar de cuenta'], 'rem': ['Reminders', 'Recordatorios'], 'caught': ['You are all caught up!', '¡Estás al día!'], 'cohort': ['Cohort 2026-A', 'Cohorte 2026-A'], 'menu': ['Menu', 'Menú'], 'ok': ['Done', 'Listo']
+        };
+        const T = { en: {}, es: {} }; for (const k in D) { T.en[k] = D[k][0]; T.es[k] = D[k][1] }
+        const CAT = { dev: { c: '#6857E8', i: '</>' }, eng: { c: '#2563EB', i: 'Aa' }, soc: { c: '#DB2777', i: '♥' }, oth: { c: '#64748B', i: '▦' } };
+        const TYPES = ['main', 'practice', 'comp', 'project', 'assess', 'personal', 'admin', 'other'], SRCS = ['riwi', 'challenges', 'english', 'instructor', 'personal'], PRS = ['high', 'med', 'low'];
+        const STU = [{ id: 'valentina', name: 'Valentina Ríos', ini: 'VR', col: '#6857E8' }, { id: 'santiago', name: 'Santiago Mejía', ini: 'SM', col: '#2563EB' }, { id: 'camila', name: 'Camila Torres', ini: 'CT', col: '#DB2777' }];
+        const SEED = {
+            valentina: [["Build REST API with Express", "dev", "main", 3, "i", "high", "challenges"], ["Refactor JS closures exercises", "dev", "practice", -2, "p", "med", "riwi"], ["Read docs: PostgreSQL indexes", "dev", "comp", 8, "p", "low", "instructor"], ["Portfolio project: landing page", "dev", "project", 14, "i", "high", "riwi"], ["Algorithms: sorting challenge", "dev", "main", 0, "p", "high", "challenges"], ["Git branching practice", "dev", "practice", -5, "d", "med", "riwi"], ["Speaking: introduce your project", "eng", "assess", 2, "p", "high", "english"], ["Vocabulary quiz unit 4", "eng", "practice", 5, "p", "med", "english"], ["Listening: podcast summary", "eng", "comp", -1, "p", "med", "english"], ["Writing: formal email", "eng", "practice", -3, "d", "low", "english"], ["Team retrospective reflection", "soc", "", 6, "p", "med", "instructor"], ["Peer feedback workshop", "soc", "comp", 1, "i", "med", "riwi"], ["Update CV and LinkedIn", "oth", "admin", 9, "p", "low", "personal"], ["Submit attendance justification", "oth", "admin", -1, "d", "med", "riwi"]],
+            santiago: [["Docker basics lab", "dev", "practice", 4, "p", "med", "instructor"], ["Debug the shopping cart bug", "dev", "main", -4, "p", "high", "challenges"], ["Unit testing with Jest", "dev", "comp", 10, "i", "med", "riwi"], ["Final project proposal", "dev", "project", 20, "p", "high", "riwi"], ["JavaScript arrays challenge", "dev", "main", -7, "d", "high", "challenges"], ["Grammar: past perfect worksheet", "eng", "practice", 1, "p", "med", "english"], ["Speaking club: 3-minute talk", "eng", "assess", 7, "p", "high", "english"], ["Listening log week 5", "eng", "practice", -2, "i", "low", "english"], ["Conflict resolution reflection", "soc", "", 3, "p", "med", "instructor"], ["Buy USB-C adapter", "oth", "personal", 0, "p", "low", "personal"], ["Confirm laptop loan form", "oth", "admin", -6, "d", "med", "riwi"]],
+            camila: [["Responsive navbar challenge", "dev", "main", -1, "d", "med", "challenges"], ["Intro to React hooks", "dev", "practice", 2, "i", "high", "riwi"], ["Open-source contribution research", "dev", "comp", 12, "p", "low", "instructor"], ["Capstone sprint 1 demo", "dev", "project", 5, "p", "high", "riwi"], ["Vocabulary flashcards unit 6", "eng", "practice", -3, "d", "low", "english"], ["Writing: product description", "eng", "assess", 6, "i", "med", "english"], ["Teamwork canvas activity", "soc", "", -4, "d", "med", "instructor"], ["Emotional intelligence journal", "soc", "personal", 3, "p", "low", "personal"], ["Renew student ID", "oth", "admin", 15, "p", "med", "riwi"], ["Book mentorship session", "oth", "personal", 1, "p", "med", "personal"]]
+        };
+        const $ = s => document.querySelector(s), E = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const ld = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d } catch (e) { return d } }, sv = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } };
+        const p2 = n => String(n).padStart(2, '0'), iso = d => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()), pd = s => new Date(s + 'T00:00:00');
+        const add = n => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + n); return iso(d) };
+        const LOC = { es: 'es-CO', en: 'en-US' }, SD = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        const fmt = (d, o) => new Intl.DateTimeFormat(LOC[S.lang], o).format(typeof d == 'string' && d.length == 10 ? pd(d) : new Date(d));
+        const P0 = ld('rtm_p', { lang: (navigator.language || 'es').startsWith('en') ? 'en' : 'es', theme: 'auto', notif: true, view: 'list', hide: false });
+        const S = { lang: P0.lang, theme: P0.theme, P: P0, route: ld('rtm_u', null) ? 'app' : 'landing', user: ld('rtm_u', null), page: 'dash', tasks: [], act: [], f: { q: '', cat: '', st: '', pr: '', ty: '', src: '', dl: '', sort: 'asc' }, pick: 'valentina', cm: { y: new Date().getFullYear(), m: new Date().getMonth() }, sel: add(0), csel: 'dev', menu: false };
+        const t = (k, v) => { let s = T[S.lang][k] ?? k; if (v) for (const a in v) s = s.replace('{' + a + '}', v[a]); return s };
+        const saveP = () => { S.P.lang = S.lang; S.P.theme = S.theme; sv('rtm_p', S.P) }, saveT = () => { sv('rtm_t_' + S.user, S.tasks); sv('rtm_a_' + S.user, S.act) };
+        function load(u) {
+            S.user = u; sv('rtm_u', u); const seed = SEED[u].map((r, i) => ({ id: u + i, title: r[0], desc: '', cat: r[1], ty: r[2], due: add(r[3]), st: r[4] == 'd' ? 'done' : r[4] == 'i' ? 'progress' : 'pending', pr: r[5], src: r[6], created: add(-9 - i), notes: '', url: '', doneAt: r[4] == 'd' ? add(-(i % 6)) : null }));
+            S.tasks = ld('rtm_t_' + u, seed); const h = n => new Date(Date.now() - n * 36e5).toISOString(); S.act = ld('rtm_a_' + u, [{ k: 'completed', title: seed.find(x => x.st == 'done').title, at: h(5) }, { k: 'created', title: seed[2].title, at: h(26) }, { k: 'deadline', title: seed[0].title, at: h(50) }, { k: 'reopened', title: seed[1].title, at: h(75) }])
+        }
+        const log = (k, title) => { S.act.unshift({ k, title, at: new Date().toISOString() }); S.act = S.act.slice(0, 12) };
+        const diff = x => Math.round((pd(x.due) - pd(add(0))) / 864e5), st = x => x.st == 'done' ? 'done' : diff(x) < 0 ? 'overdue' : x.st;
+        function dl(x) { const d = diff(x); if (x.st == 'done') return { c: '#22C55E', i: '✓', l: t('st.done') }; if (d < 0) return { c: '#B91C1C', i: '⚠', l: d == -1 ? t('ov1') : t('ov', { n: -d }) }; if (d == 0) return { c: '#EF4444', i: '⏰', l: t('tod') }; if (d == 1) return { c: '#F97316', i: '▲', l: t('tmr') }; if (d <= 3) return { c: '#F97316', i: '▲', l: t('in', { n: d }) }; if (d <= 7) return { c: '#EAB308', i: '◔', l: t('in', { n: d }) }; return { c: '#64748B', i: '○', l: t('in', { n: d }) } }
+        const badge = x => { const d = dl(x); return `<span class="bdg" style="--c:${d.c}"><b aria-hidden="true">${d.i}</b>${E(d.l)}</span>` };
+        const stats = l => ({ total: l.length, done: l.filter(x => x.st == 'done').length, pend: l.filter(x => st(x) == 'pending' || st(x) == 'progress').length, over: l.filter(x => st(x) == 'overdue').length, soon: l.filter(x => x.st != 'done' && diff(x) >= 0 && diff(x) <= 3).length });
+        const pct = l => l.length ? Math.round(l.filter(x => x.st == 'done').length * 100 / l.length) : 0;
+        const PW = { high: 0, med: 1, low: 2 };
+        function dlf(x, f) { if (!f) return true; const d = diff(x), s = st(x); return f == 'over' ? s == 'overdue' : f == 'today' ? d == 0 && s != 'done' : f == 'week' ? d >= 0 && d <= 7 && s != 'done' : d > 7 && s != 'done' }
+        function flt() {
+            const f = S.f, q = f.q.toLowerCase(); let l = S.tasks.filter(x => (!q || (x.title + ' ' + x.desc + ' ' + t('c.' + x.cat)).toLowerCase().includes(q)) && (!f.cat || x.cat == f.cat) && (!f.st || st(x) == f.st) && (!f.pr || x.pr == f.pr) && (!f.ty || x.ty == f.ty) && (!f.src || x.src == f.src) && dlf(x, f.dl) && !(S.P.hide && x.st == 'done'));
+            const o = { asc: (a, b) => a.due.localeCompare(b.due), desc: (a, b) => b.due.localeCompare(a.due), pr: (a, b) => PW[a.pr] - PW[b.pr] || a.due.localeCompare(b.due), new: (a, b) => b.created.localeCompare(a.created) || b.id.localeCompare(a.id), az: (a, b) => a.title.localeCompare(b.title, LOC[S.lang]) }; return l.sort(o[f.sort])
+        }
+        const LS = () => `<div class="ls" role="group" aria-label="${t('lang')}"><button data-a="lang" data-v="es" aria-pressed="${S.lang == 'es'}">🇨🇴 ES</button><button data-a="lang" data-v="en" aria-pressed="${S.lang == 'en'}">🇺🇸 EN</button></div>`;
+        const logo = `<span class="logo">riwi<b>.</b></span>`;
+        const opts = (arr, pre, sel, blank) => (blank ? `<option value="">${blank}</option>` : '') + arr.map(v => `<option value="${v}" ${v == sel ? 'selected' : ''}>${t(pre + v)}</option>`).join('');
+        function row(x) { const s = st(x), c = CAT[x.cat]; return `<div class="tk ${s == 'done' ? 'dn' : ''}"><button class="ck" data-a="tog" data-id="${x.id}" aria-pressed="${s == 'done'}" aria-label="${t(s == 'done' ? 'reopen' : 'complete')}: ${E(x.title)}" title="${t(s == 'done' ? 'reopen' : 'complete')}">${s == 'done' ? '✓' : ''}</button><div class="tm"><button class="tt" data-a="view" data-id="${x.id}">${E(x.title)}</button><div class="ch"><span class="cc" style="--c:${c.c}">${c.i} ${t('c.' + x.cat)}</span>${x.ty ? `<span>${t('ty.' + x.ty)}</span>` : ''}<span>${x.pr == 'high' ? '▲ ' : ''}${t('pr.' + x.pr)}</span><span>${t('src.' + x.src)}</span>${s != 'done' ? `<span>${t('st.' + s)}</span>` : ''}</div></div>${badge(x)}<div class="row"><button class="btn s" data-a="edit" data-id="${x.id}" aria-label="${t('edit')}" title="${t('edit')}">✎</button><button class="btn s" data-a="del" data-id="${x.id}" aria-label="${t('del')}" title="${t('del')}">🗑</button></div></div>` }
+        const empty = () => `<div class="emp card"><b>${t('noRes')}</b>${t('noResD')}<div class="row" style="justify-content:center;margin-top:12px"><button class="btn" data-a="clr">${t('clr')}</button><button class="btn p" data-a="add">＋ ${t('addT')}</button></div></div>`;
+        const tlist = l => l.length ? `<div class="${S.P.view == 'card' ? 'cards' : ''}">${l.map(row).join('')}</div>` : empty();
+        const catCard = (k, sel) => { const l = S.tasks.filter(x => x.cat == k), s = stats(l), p = pct(l), c = CAT[k]; return `<button class="card" data-a="${sel === undefined ? 'catf' : 'ccat'}" data-v="${k}" ${sel !== undefined ? `aria-pressed="${sel}"` : ''} style="--c:${c.c}"><div class="sc"><span class="ic" style="--c:${c.c}" aria-hidden="true">${c.i}</span><div><b style="font-size:16px">${t('c.' + k)}</b><div class="mut">${t('tasksN', { n: s.total })}</div></div><span class="sp"></span><b style="font-size:20px">${p}%</b></div><div class="pb" role="progressbar" aria-valuenow="${p}" aria-valuemin="0" aria-valuemax="100"><i style="width:${p}%"></i></div><div class="mut" style="margin-top:6px">${t('doneN', { n: s.done })} · ${t('pendN', { n: s.total - s.done })}</div></button>` };
+        function dash() {
+            const s = stats(S.tasks), open = S.tasks.filter(x => x.st != 'done');
+            const focus = open.filter(x => diff(x) <= 2 || (x.pr == 'high' && diff(x) <= 7)).sort((a, b) => diff(a) - diff(b) || PW[a.pr] - PW[b.pr]).slice(0, 6), up = open.filter(x => diff(x) >= 0).sort((a, b) => a.due.localeCompare(b.due)).slice(0, 6);
+            const card = (l, v, i, c) => `<div class="card sc" style="--c:${c}"><span class="ic" style="--c:${c}" aria-hidden="true">${i}</span><div><b>${v}</b><div class="mut">${l}</div></div></div>`;
+            return `<div class="g g5">${card(t('total'), s.total, 'Σ', '#6857E8')}${card(t('st.done'), s.done, '✓', '#22C55E')}${card(t('st.pending'), s.pend, '◔', '#EAB308')}${card(t('st.overdue'), s.over, '⚠', '#B91C1C')}${card(t('soon'), s.soon, '⏰', '#F97316')}</div>
+<div class="g g4 sec" style="margin-top:18px">${Object.keys(CAT).map(k => catCard(k)).join('')}</div>
+<div class="g g2" style="margin-top:18px"><section class="sec"><h2>${t('focus')}</h2>${focus.length ? focus.map(row).join('') : `<div class="emp card">${t('caught')}</div>`}</section><section class="sec"><h2>${t('upc')}</h2>${up.map(row).join('')}</section></div>
+<section class="sec card" style="margin-top:18px"><h2>${t('rec')}</h2>${S.act.slice(0, 6).map(a => `<div class="row" style="padding:6px 0;border-bottom:1px solid var(--bd)"><span aria-hidden="true">●</span><span><b>${t('a.' + a.k)}</b>: ${E(a.title)}</span><span class="sp"></span><span class="mut">${fmt(a.at, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span></div>`).join('')}</section>`
+        }
+        function tasks() {
+            const f = S.f, sel = (k, h, body) => `<select data-f="${k}" aria-label="${h}">${body}</select>`;
+            return `<div class="tb">${sel('cat', t('fcat'), opts(Object.keys(CAT), 'c.', f.cat, t('fcat') + ': ' + t('all')))}${sel('st', t('fst'), opts(['pending', 'progress', 'done', 'overdue'], 'st.', f.st, t('fst') + ': ' + t('all')))}${sel('pr', t('fpr'), opts(PRS, 'pr.', f.pr, t('fpr') + ': ' + t('all')))}${sel('ty', t('fty'), opts(TYPES, 'ty.', f.ty, t('fty') + ': ' + t('all')))}${sel('src', t('fsrc'), opts(SRCS, 'src.', f.src, t('fsrc') + ': ' + t('all')))}${sel('dl', t('fdl'), `<option value="">${t('fdl')}: ${t('all')}</option>` + ['over', 'today', 'week', 'later'].map(v => `<option value="${v}" ${f.dl == v ? 'selected' : ''}>${t('dl.' + v)}</option>`).join(''))}${sel('sort', t('sort'), ['asc', 'desc', 'pr', 'new', 'az'].map(v => `<option value="${v}" ${f.sort == v ? 'selected' : ''}>${t('sort')}: ${t('s.' + v)}</option>`).join(''))}<div class="ls"><button data-a="vw" data-v="list" aria-pressed="${S.P.view != 'card'}">☰ ${t('v.list')}</button><button data-a="vw" data-v="card" aria-pressed="${S.P.view == 'card'}">▦ ${t('v.card')}</button></div></div><div id="tl">${tlist(flt())}</div>`
+        }
+        function cats() { const l = S.tasks.filter(x => x.cat == S.csel).sort((a, b) => a.due.localeCompare(b.due)); return `<div class="g g4">${Object.keys(CAT).map(k => catCard(k, k == S.csel)).join('')}</div><h2 style="margin:18px 0 10px;font-size:17px">${t('c.' + S.csel)}</h2>${tlist(l)}` }
+        function calv() {
+            const { y, m } = S.cm, ws = S.lang == 'es' ? 1 : 0, off = (new Date(y, m, 1).getDay() - ws + 7) % 7, n = new Date(y, m + 1, 0).getDate(), td = add(0); let cells = '';
+            for (let i = 0; i < 7; i++)cells += `<div class="w">${fmt(new Date(2024, 0, 7 + ws + i), { weekday: 'short' })}</div>`;
+            for (let i = 0; i < off; i++)cells += `<div></div>`;
+            for (let d = 1; d <= n; d++) { const ds = y + '-' + p2(m + 1) + '-' + p2(d), l = S.tasks.filter(x => x.due == ds); cells += `<button class="cd ${ds == td ? 't' : ''} ${l.length >= 3 ? 'hv' : ''}" data-a="day" data-v="${ds}" aria-pressed="${ds == S.sel}" aria-label="${fmt(ds, { dateStyle: 'full' })}: ${l.length}"><b>${d}</b><span class="dots">${l.slice(0, 3).map(x => `<i style="--c:${CAT[x.cat].c}"></i>`).join('')}${l.length > 3 ? `<em>+${l.length - 3}</em>` : ''}${l.length >= 3 ? `<em>⚠</em>` : ''}</span></button>` }
+            const sl = S.tasks.filter(x => x.due == S.sel);
+            return `<div class="card"><div class="row" style="margin-bottom:12px"><button class="btn" data-a="cn" data-v="-1" aria-label="‹">‹</button><h2 class="sp" style="text-align:center;text-transform:capitalize">${fmt(new Date(y, m, 1), { month: 'long', year: 'numeric' })}</h2><button class="btn" data-a="cn" data-v="0">${t('cal.today')}</button><button class="btn" data-a="cn" data-v="1" aria-label="›">›</button></div><div class="cal">${cells}</div><div class="row" style="margin-top:10px">${Object.keys(CAT).map(k => `<span class="mut"><span class="dots" style="display:inline-flex"><i style="--c:${CAT[k].c}"></i></span> ${t('c.' + k)}</span>`).join('')}</div></div><h2 style="margin:18px 0 10px;font-size:17px;text-transform:capitalize">${fmt(S.sel, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h2>${sl.length ? sl.map(row).join('') : `<div class="emp card">${t('cal.no')}</div>`}`
+        }
+        function jour() {
+            const s = stats(S.tasks), p = pct(S.tasks), days = [...Array(7)].map((_, i) => add(i - 6)), cn = days.map(d => S.tasks.filter(x => x.doneAt == d).length), mx = Math.max(1, ...cn);
+            const tile = (l, v) => `<div class="card"><b style="font-size:26px">${v}</b><div class="mut">${l}</div></div>`;
+            return `<div class="g g2"><div class="card row" style="gap:22px"><div class="don" style="background:conic-gradient(#22C55E ${p * 3.6}deg,var(--bd) 0)" role="img" aria-label="${t('ov.pct')} ${p}%"><div>${p}%</div></div><div><h2 style="font-size:17px">${t('ov.pct')}</h2><p class="mut" style="margin:6px 0">${t('dvp')}</p><p>✓ ${t('doneN', { n: s.done })}</p><p>◔ ${t('pendN', { n: s.total - s.done })}</p></div></div><div class="card"><h2 style="font-size:17px;margin-bottom:12px">${t('l7')}</h2><div class="bars">${days.map((d, i) => `<div><span>${cn[i]}</span><i style="height:${cn[i] * 100 / mx}%"></i><span class="mut">${fmt(d, { weekday: 'short' })}</span></div>`).join('')}</div></div></div>
+<div class="g g2" style="margin-top:14px"><div class="card"><h2 style="font-size:17px;margin-bottom:8px">${t('bycat')}</h2>${Object.keys(CAT).map(k => { const l = S.tasks.filter(x => x.cat == k), q = pct(l); return `<div style="margin:10px 0;--c:${CAT[k].c}"><div class="row"><b>${CAT[k].i} ${t('c.' + k)}</b><span class="sp"></span>${q}%</div><div class="pb"><i style="width:${q}%"></i></div></div>` }).join('')}</div><div><h2 style="font-size:17px;margin-bottom:10px">${t('stats')}</h2><div class="g g5" style="grid-template-columns:1fr 1fr">${tile(t('s7'), cn.reduce((a, b) => a + b, 0))}${tile(t('sHigh'), S.tasks.filter(x => x.st != 'done' && x.pr == 'high').length)}${tile(t('sProg'), S.tasks.filter(x => x.st == 'progress').length)}${tile(t('sSrc'), new Set(S.tasks.map(x => x.src)).size)}</div></div></div>`
+        }
+        function sett() {
+            const u = STU.find(x => x.id == S.user), ck = (k, l, v) => `<label class="row"><input type="checkbox" style="width:20px;min-height:20px" data-p="${k}" ${v ? 'checked' : ''}> ${l}</label>`;
+            return `<div class="g g2"><div class="card"><h2>${t('prof')}</h2><div class="row" style="margin:12px 0"><span class="av" style="background:${u.col};width:54px;height:54px">${u.ini}</span><div><b>${u.name}</b><div class="mut">${u.id}@example.com · ${t('cohort')}</div></div></div><p class="mut">${t('proto')}</p><h2 style="margin:16px 0 8px">${t('acct')}</h2>${STU.map(s => `<button class="stu" data-a="swu" data-v="${s.id}" aria-pressed="${s.id == S.user}"><span class="av" style="background:${s.col}">${s.ini}</span><b>${s.name}</b></button>`).join('')}</div>
+<div class="card"><h2>${t('lang')}</h2><div style="margin:8px 0 16px">${LS()}</div><h2>${t('theme')}</h2><select data-p="theme" aria-label="${t('theme')}" style="margin:8px 0 16px">${['auto', 'light', 'dark'].map(v => `<option value="${v}" ${S.theme == v ? 'selected' : ''}>${t(v)}</option>`).join('')}</select><h2>${t('notif')}</h2><div style="margin:8px 0 16px">${ck('notif', t('nOn'), S.P.notif)}</div><h2>${t('disp')}</h2><div style="margin:8px 0">${ck('hide', t('hide'), S.P.hide)}</div><select data-p="view" aria-label="${t('disp')}"><option value="list" ${S.P.view != 'card' ? 'selected' : ''}>${t('v.list')}</option><option value="card" ${S.P.view == 'card' ? 'selected' : ''}>${t('v.card')}</option></select></div></div>`
+        }
+        const urgent = () => S.tasks.filter(x => x.st != 'done' && diff(x) <= 1);
+        function appv() {
+            const u = STU.find(x => x.id == S.user), NV = [['dash', '▦'], ['tasks', '☑'], ['cal', '▤'], ['cats', '◧'], ['jour', '↗'], ['sett', '⚙']], pg = { dash, tasks, cal: calv, cats, jour, sett }[S.page](), n = S.P.notif ? urgent().length : 0;
+            return `<div class="app"><nav class="side ${S.menu ? 'open' : ''}" aria-label="${t('menu')}">${logo.replace('logo', 'logo')}${NV.map(([k, i]) => `<button class="nv" data-a="go" data-v="${k}" ${S.page == k ? 'aria-current="page"' : ''}><span aria-hidden="true">${i}</span>${t('nav.' + k)}</button>`).join('')}<span class="sp"></span><div class="row" style="padding:10px"><span class="av" style="background:${u.col}">${u.ini}</span><div><b style="font-size:14px">${u.name}</b></div></div><button class="nv" data-a="out"><span aria-hidden="true">⇄</span>${t('logout')}</button></nav>
+<main class="main"><header class="hd"><button class="btn s mb" data-a="menu" aria-label="${t('menu')}">☰</button><div class="sp" style="min-width:160px"><h1 style="font-size:22px">${t('hi', { n: u.name.split(' ')[0] })} 👋</h1><p class="mut" style="text-transform:capitalize">${fmt(add(0), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p></div><input id="hq" type="search" data-f="q" placeholder="${t('search')}" aria-label="${t('search')}" value="${E(S.f.q)}"><button class="btn" data-a="bell" aria-label="${t('rem')}">🔔${n ? `<span class="nb">${n}</span>` : ''}</button>${LS()}<button class="btn p" data-a="add">＋ <span class="qa">${t('quick')}</span></button><span class="av" style="background:${u.col}" aria-hidden="true">${u.ini}</span></header><h2 style="margin-bottom:14px;font-size:20px">${t('nav.' + S.page)}</h2>${pg}</main></div>`
+        }
+        function landing() {
+            const fe = [['f1', '◧'], ['f2', '⏰'], ['f3', '↗'], ['f4', '▦'], ['f5', '＋']];
+            return `<div class="wrap"><header class="row">${logo}<span class="sp"></span><a href="#features" class="btn" style="text-decoration:none;color:inherit">${t('feat')}</a>${LS()}<button class="btn p" data-a="start">${t('start')}</button></header>
+<section class="hero"><div><p class="mut" style="font-weight:700;color:var(--pr)">${t('tag')}</p><h1 style="margin:10px 0">${t('h1')}</h1><p class="mut" style="font-size:17px;margin-bottom:20px">${t('h2')}</p><button class="btn p" data-a="start" style="font-size:16px;padding:12px 24px">${t('start')} →</button></div>
+<div class="card" aria-hidden="true"><div class="row"><b>${t('focus')}</b></div>${[['dev', 'Build REST API', 3], ['eng', 'Speaking practice', 1], ['soc', 'Peer feedback', 0]].map(([c, n, d]) => `<div class="tk"><span class="ic" style="--c:${CAT[c].c}">${CAT[c].i}</span><b class="tm" style="min-width:90px">${n}</b>${badge({ st: 'pending', due: add(d) })}</div>`).join('')}<div class="pb" style="--c:#6857E8"><i style="width:64%"></i></div></div></section>
+<section id="features" class="sec"><h2 style="font-size:26px;text-align:center;margin-bottom:18px">${t('ftit')}</h2><div class="g g4">${fe.map(([k, i]) => `<div class="card"><span class="ic" style="--c:#6857E8">${i}</span><h3 style="margin:10px 0 4px">${t(k)}</h3><p class="mut">${t(k + 'd')}</p></div>`).join('')}</div></section>
+<section class="card" style="margin:36px 0;text-align:center;background:var(--navy);color:#fff"><h2 style="font-size:24px;margin-bottom:12px">${t('cta')}</h2><button class="btn p" data-a="start">${t('start')} →</button></section><p class="mut" style="text-align:center">${t('proto')}</p></div>`
+        }
+        function login() { return `<div class="wrap" style="max-width:480px"><header class="row">${logo}<span class="sp"></span>${LS()}</header><div class="card" style="margin-top:30px"><h1 style="font-size:26px">${t('wel')} 👋</h1><p class="mut" style="margin:6px 0 16px">${t('pick')}</p>${STU.map(s => { const l = SEED[s.id], d = l.filter(r => r[4] == 'd').length; return `<button class="stu" data-a="pick" data-v="${s.id}" aria-pressed="${S.pick == s.id}"><span class="av" style="background:${s.col}">${s.ini}</span><span><b>${s.name}</b><br><span class="mut">${l.length} · ✓ ${d}</span></span></button>` }).join('')}<button class="btn p" data-a="login" style="width:100%;margin-top:6px">${t('enter')}</button><p class="mut" style="margin-top:12px">${t('proto')}</p><button class="btn s" data-a="home" style="margin-top:8px">← ${t('back')}</button></div></div>` }
+        function render() {
+            const r = document.documentElement; r.lang = S.lang; S.theme == 'auto' ? r.removeAttribute('data-theme') : r.dataset.theme = S.theme; document.title = 'Riwi Task Manager';
+            $('#app').innerHTML = S.route == 'landing' ? landing() : S.route == 'login' ? login() : appv()
+        }
+        function toast(k) { const e = document.createElement('div'); e.id = 'toast'; e.setAttribute('role', 'status'); e.textContent = t(k); document.body.append(e); setTimeout(() => e.remove(), 2400) }
+        const closeM = () => { $('#m').innerHTML = '' };
+        const modal = h => { $('#m').innerHTML = `<div class="ov" data-a="bg"><div class="card md" role="dialog" aria-modal="true">${h}</div></div>`; const f = $('#m input,#m button'); f && f.focus() };
+        function form(x) {
+            x = x || {}; const v = (k, d) => E(x[k] ?? d ?? '');
+            return `<h2 style="margin-bottom:6px">${x.id ? t('editT') : t('addT')}</h2><form id="tf" novalidate class="fm"><input type="hidden" name="id" value="${v('id')}"><div class="f"><label for="f1">${t('ttl')} *</label><input id="f1" name="title" value="${v('title')}" maxlength="90"><small class="er" data-e="title"></small></div>
+<div><label for="f2">${t('fcat')} *</label><select id="f2" name="cat">${opts(Object.keys(CAT), 'c.', x.cat || 'dev')}</select></div><div><label for="f3">${t('fdl')} *</label><input id="f3" type="date" name="due" value="${v('due', add(1))}"><small class="er" data-e="due"></small></div>
+<div><label for="f4">${t('fty')}</label><select id="f4" name="ty">${opts(TYPES, 'ty.', x.ty, t('none'))}</select></div><div><label for="f5">${t('fpr')}</label><select id="f5" name="pr">${opts(PRS, 'pr.', x.pr || 'med')}</select></div>
+<div><label for="f6">${t('fsrc')}</label><select id="f6" name="src">${opts(SRCS, 'src.', x.src || 'personal')}</select></div><div><label for="f7">${t('fst')}</label><select id="f7" name="st">${opts(['pending', 'progress', 'done'], 'st.', x.st || 'pending')}</select></div>
+<div class="f"><label for="f8">${t('desc')}</label><textarea id="f8" name="desc" rows="2">${v('desc')}</textarea></div><div class="f"><label for="f9">${t('fnotes')}</label><textarea id="f9" name="notes" rows="2">${v('notes')}</textarea></div><div class="f"><label for="f10">${t('url')}</label><input id="f10" name="url" type="url" value="${v('url')}" placeholder="https://"></div>
+<div class="f row" style="justify-content:flex-end;margin-top:14px"><button type="button" class="btn" data-a="close">${t('cancel')}</button><button class="btn p">${t('save')}</button></div></form>`
+        }
+        function detail(x) {
+            const c = CAT[x.cat], s = st(x), r = (l, v) => `<p style="margin:6px 0"><span class="mut">${l}:</span> ${v || '—'}</p>`;
+            return `<div class="row"><span class="ic" style="--c:${c.c}" aria-hidden="true">${c.i}</span><h2 class="sp">${E(x.title)}</h2></div><div style="margin:10px 0">${badge(x)}</div>${r(t('fcat'), t('c.' + x.cat))}${r(t('fty'), x.ty && t('ty.' + x.ty))}${r(t('fdl'), fmt(x.due, SD) + ' (' + fmt(x.due, { weekday: 'long' }) + ')')}${r(t('fpr'), t('pr.' + x.pr))}${r(t('fsrc'), t('src.' + x.src))}${r(t('created'), fmt(x.created, SD))}${r(t('desc'), E(x.desc))}${r(t('fnotes'), E(x.notes))}${x.url && /^https?:/.test(x.url) ? `<p><a href="${E(x.url)}" target="_blank" rel="noopener noreferrer">${t('open')} ↗</a></p>` : ''}
+<label class="mut" for="ds" style="display:block;margin-top:10px">${t('fst')}</label><select id="ds" data-sid="${x.id}">${opts(['pending', 'progress', 'done'], 'st.', x.st)}</select><div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-a="edit" data-id="${x.id}">✎ ${t('edit')}</button><button class="btn d" data-a="del" data-id="${x.id}">${t('del')}</button><button class="btn" data-a="close">${t('close')}</button></div>`
+        }
+        const get = id => S.tasks.find(x => x.id == id);
+        function setSt(x, v) { const was = x.st; x.st = v; x.doneAt = v == 'done' ? (x.doneAt || add(0)) : null; if (v == 'done' && was != 'done') log('completed', x.title); else if (was == 'done' && v != 'done') log('reopened', x.title); else log('updated', x.title) }
+        const A = {
+            lang(_, v) { S.lang = v; saveP(); closeM(); render() }, start() { S.route = S.user ? 'app' : 'login'; render() }, home() { S.route = 'landing'; render() }, pick(_, v) { S.pick = v; render() },
+            login() { load(S.pick); S.route = 'app'; S.page = 'dash'; render() }, out() { S.route = 'login'; S.menu = false; render() }, go(_, v) { S.page = v; S.menu = false; render(); scrollTo(0, 0) }, menu() { S.menu = !S.menu; render() },
+            swu(_, v) { load(v); toast('ok'); render() }, close: closeM, bg(_, v, b) { },
+            tog(id) { const x = get(id); setSt(x, x.st == 'done' ? 'pending' : 'done'); saveT(); toast(x.st == 'done' ? 'ok.done' : 'ok.re'); render() },
+            view(id) { modal(detail(get(id))) }, edit(id) { modal(form(get(id))) }, add() { modal(form()) },
+            del(id) { const x = get(id); modal(`<h2>${t('del')}</h2><p style="margin:10px 0 16px">${t('delQ')}<br><b>${E(x.title)}</b></p><div class="row" style="justify-content:flex-end"><button class="btn" data-a="close">${t('cancel')}</button><button class="btn d" data-a="delok" data-id="${id}">${t('del')}</button></div>`) },
+            delok(id) { const x = get(id); log('deleted', x.title); S.tasks = S.tasks.filter(y => y.id != id); saveT(); closeM(); toast('ok.d'); render() },
+            catf(_, v) { S.f = { q: '', cat: v, st: '', pr: '', ty: '', src: '', dl: '', sort: 'asc' }; S.page = 'tasks'; render() }, ccat(_, v) { S.csel = v; render() }, clr() { S.f = { q: '', cat: '', st: '', pr: '', ty: '', src: '', dl: '', sort: S.f.sort }; render() },
+            vw(_, v) { S.P.view = v; saveP(); render() }, day(_, v) { S.sel = v; render() },
+            cn(_, v) { v = +v; if (!v) { const d = new Date(); S.cm = { y: d.getFullYear(), m: d.getMonth() }; S.sel = add(0) } else { const d = new Date(S.cm.y, S.cm.m + v, 1); S.cm = { y: d.getFullYear(), m: d.getMonth() } } render() },
+            bell() { const l = urgent().sort((a, b) => diff(a) - diff(b)); modal(`<h2 style="margin-bottom:10px">🔔 ${t('rem')}</h2>${l.length ? l.map(row).join('') : `<div class="emp">${t('caught')}</div>`}<div class="row" style="justify-content:flex-end"><button class="btn" data-a="close">${t('close')}</button></div>`) }
+        };
+        document.addEventListener('click', e => { const b = e.target.closest('[data-a]'); if (!b) return; if (b.dataset.a == 'bg' && e.target !== b) return; if (b.dataset.a == 'bg') return closeM(); const f = A[b.dataset.a]; if (f) { if (['tog', 'view', 'edit', 'del', 'delok'].includes(b.dataset.a) && $('#m .ov') && b.dataset.a != 'delok' && b.dataset.a != 'tog') closeM(); f(b.dataset.id, b.dataset.v, b); if (['tog'].includes(b.dataset.a) && $('#m .ov')) { closeM(); } } });
+        document.addEventListener('input', e => { if (e.target.dataset.f != 'q') return; S.f.q = e.target.value; if (S.page != 'tasks') { S.page = 'tasks'; render(); const h = $('#hq'); h.focus(); h.setSelectionRange(99, 99) } else $('#tl').innerHTML = tlist(flt()) });
+        document.addEventListener('change', e => { const el = e.target; if (el.dataset.f) { S.f[el.dataset.f] = el.value; render() } else if (el.dataset.p) { const k = el.dataset.p, v = el.type == 'checkbox' ? el.checked : el.value; k == 'theme' ? S.theme = v : S.P[k] = v; saveP(); render() } else if (el.dataset.sid) { const x = get(el.dataset.sid); setSt(x, el.value); saveT(); toast('ok.s'); render() } });
+        document.addEventListener('submit', e => {
+            e.preventDefault(); const f = e.target, d = Object.fromEntries(new FormData(f)), er = {}; if (d.title.trim().length < 3) er.title = t('eT'); if (!d.due) er.due = t('eD');
+            f.querySelectorAll('[data-e]').forEach(s => s.textContent = er[s.dataset.e] || ''); const ks = Object.keys(er); if (ks.length) { f.elements[ks[0]].setAttribute('aria-invalid', 'true'); return f.elements[ks[0]].focus() }
+            if (d.id) { const x = get(d.id), od = x.due; Object.assign(x, { title: d.title.trim(), desc: d.desc, notes: d.notes, url: d.url, cat: d.cat, ty: d.ty, due: d.due, pr: d.pr, src: d.src }); setSt(x, d.st); if (od != d.due) log('deadline', x.title); toast('ok.s') }
+            else { const x = { id: 'n' + Date.now(), title: d.title.trim(), desc: d.desc, notes: d.notes, url: d.url, cat: d.cat, ty: d.ty, due: d.due, pr: d.pr, src: d.src, st: d.st, created: add(0), doneAt: d.st == 'done' ? add(0) : null }; S.tasks.push(x); log('created', x.title); toast('ok.c') }
+            saveT(); closeM(); render()
+        });
+        document.addEventListener('keydown', e => { if (e.key == 'Escape') closeM() });
+        if (S.user) load(S.user); render();
+    </script>
+</body>
+
+</html>
