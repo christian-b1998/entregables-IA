@@ -15,12 +15,12 @@ Por eso los algoritmos de los integrantes del grupo son muy parecidos entre sí.
 
 ## Versiones
 
-Se hicieron dos versiones del mismo algoritmo, ambas basadas en el método de la burbuja:
+Se hicieron dos versiones del mismo algoritmo, ambas basadas en el método de la burbuja. Las dos están en el mismo archivo, `NOMBRE-DEL-ARCHIVO.psc`:
 
-| Versión | Archivo | Idea |
-| --- | --- | --- |
-| Ciclos y arreglo | `OrdenarTresNumeros_ciclos.psc` | Guarda los números en un arreglo de 3 posiciones y usa un `Para` dentro de otro `Para`. |
-| Condicionales | `OrdenarTresNumeros_condicionales.psc` | Usa tres variables (`a`, `b`, `c`) y `Si` consecutivos, sin ciclos. |
+| Versión | Idea |
+| --- | --- |
+| Ciclos y arreglo | Guarda los números en un arreglo de 3 posiciones y usa un `Para` dentro de otro `Para`. |
+| Condicionales | Usa tres variables (`a`, `b`, `c`) y `Si` consecutivos, sin ciclos. |
 
 ## Cómo funciona
 
