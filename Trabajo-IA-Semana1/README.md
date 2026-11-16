@@ -15,7 +15,7 @@ Por eso los algoritmos de los integrantes del grupo son muy parecidos entre sí.
 
 ## Versiones
 
-Se hicieron dos versiones del mismo algoritmo, ambas basadas en el método de la burbuja. Las dos están en el mismo archivo, `NOMBRE-DEL-ARCHIVO.psc`:
+Se hicieron dos versiones del mismo algoritmo, ambas basadas en el método de la burbuja. Las dos están en el mismo archivo, OrdenarTresNumeros_ciclos.psc:
 
 | Versión | Idea |
 | --- | --- |
